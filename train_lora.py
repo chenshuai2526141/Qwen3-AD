@@ -13,7 +13,7 @@ swanlab.login(api_key="22fupc7Lfj5gnuNDp7UwX")
 
 os.environ["SWANLAB_PROJECT"] = "qwen3-sft-advertisement "
 PROMPT = "你是一个广告专家，请根据用户的关键词生成广告宣传语。"
-MAX_LENGTH = 2048
+MAX_LENGTH = 512
 
 swanlab.config.update({
     "model": "Qwen/Qwen3-0.6B",
