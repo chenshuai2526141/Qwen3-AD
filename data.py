@@ -3,6 +3,40 @@ import json
 import random
 import os
 import time
+from pathlib import Path
+
+
+def _convert_advertisegen_cache_gbk_to_utf8() -> None:
+    """AdvertiseGen 官方 CSV 为 GBK，ModelScope 用默认 UTF-8 读会失败；将缓存目录内非 UTF-8 文件转为 UTF-8。"""
+    root = (
+        Path.home()
+        / ".cache"
+        / "modelscope"
+        / "hub"
+        / "datasets"
+        / "lvjianjin"
+        / "AdvertiseGen"
+        / "master"
+        / "data_files"
+    )
+    if not root.is_dir():
+        return
+    for f in root.iterdir():
+        if not f.is_file():
+            continue
+        raw = f.read_bytes()
+        if not raw:
+            continue
+        try:
+            raw.decode("utf-8")
+        except UnicodeDecodeError:
+            try:
+                text = raw.decode("gbk")
+            except UnicodeDecodeError:
+                continue
+            f.write_text(text, encoding="utf-8")
+            print(f"已将 GBK 数据文件转为 UTF-8: {f.name}")
+
 
 # 设置ModelScope镜像源
 os.environ['MODELSCOPE_ENDPOINT'] = 'https://modelscope.oss-cn-beijing.aliyuncs.com'
@@ -14,10 +48,18 @@ random.seed(42)
 max_retries = 3
 for attempt in range(max_retries):
     try:
+        _convert_advertisegen_cache_gbk_to_utf8()
         print(f"尝试加载数据集 (第 {attempt + 1} 次)...")
         ds = MsDataset.load('lvjianjin/AdvertiseGen', subset_name='default', split='train')
         print("数据集加载成功！")
         break
+    except UnicodeDecodeError:
+        _convert_advertisegen_cache_gbk_to_utf8()
+        print(f"第 {attempt + 1} 次尝试失败: 编码问题，已尝试修复缓存后重试")
+        if attempt < max_retries - 1:
+            time.sleep(1)
+        else:
+            raise
     except Exception as e:
         print(f"第 {attempt + 1} 次尝试失败: {str(e)}")
         if attempt < max_retries - 1:
