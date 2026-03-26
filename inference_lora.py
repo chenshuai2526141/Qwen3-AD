@@ -26,7 +26,7 @@ cache_path = os.path.join(script_path, "models")
 model_dir = snapshot_download(model_name, cache_dir=cache_path, revision="master")
 
 # 加载原下载路径的tokenizer和model（CPU 推理）
-load_dtype = torch.float32
+load_dtype = torch.float16
 
 tokenizer = AutoTokenizer.from_pretrained(model_dir, use_fast=False, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(model_dir, torch_dtype=load_dtype)
@@ -43,8 +43,8 @@ model.to(device)
 # model = PeftModel.from_pretrained(model, model_id="./output/Qwen3-0.6B/checkpoint-1084")
 
 test_texts = {
-    'instruction': "你是一个医学专家，你需要根据用户的问题，给出带有思考的回答。",
-    'input': "医生，我最近被诊断为糖尿病，听说碳水化合物的选择很重要，我应该选择什么样的碳水化合物呢？"
+    'instruction': "你是一个广告专家，请根据用户的关键词生成广告宣传语。",
+    'input': "上衣,显瘦,蓝色,运动,开衫,拉链,拉链"
 }
 
 instruction = test_texts['instruction']
