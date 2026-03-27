@@ -16,7 +16,7 @@ import time
 from datetime import datetime
 import os
 
-# 与 train_lora.py、preview_sft_data.py、inference_lora.py 保持一致
+# 与 train_lora.py、inference_lora.py 保持一致
 PROMPT = "你是一个广告专家，请根据用户的关键词生成广告宣传语。"
 
 # 与 train.jsonl 中样本一致，便于对齐测试

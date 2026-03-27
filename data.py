@@ -71,11 +71,15 @@ for attempt in range(max_retries):
 
 # 将数据集转换为列表
 data_list = list(ds)
+full_count = len(data_list)
 
-# 随机打乱数据
+# 随机打乱后仅保留约全量的 1/7（向下取整，至少 1 条）
 random.shuffle(data_list)
+keep_count = max(1, full_count // 7)
+data_list = data_list[:keep_count]
+print(f"全量样本数: {full_count}，截取 1/7 后用于划分: {keep_count}")
 
-# 计算分割点
+# 计算分割点（在子集上仍按 9:1 划分）
 split_idx = int(len(data_list) * 0.9)
 
 # 分割数据
@@ -94,6 +98,6 @@ with open('val.jsonl', 'w', encoding='utf-8') as f:
         json.dump(item, f, ensure_ascii=False)
         f.write('\n')
 
-print(f"数据集已分割完成：")
+print("数据集已分割完成（子集内约 9:1 train/val）：")
 print(f"训练集大小：{len(train_data)}")
 print(f"验证集大小：{len(val_data)}")
